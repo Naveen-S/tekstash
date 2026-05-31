@@ -390,3 +390,5 @@ A few things in the notes are worth nailing down before building:
 4. **Basic search for both tiers** — the monetization table lists "Basic search" for Free and no separate search tier for Pro. Is advanced/AI-powered search a future Pro differentiator, or intentionally the same for everyone?
 5. **Deletes** — hard delete (current cascade behavior) vs soft delete (recoverable trash, which pairs well with an export feature).
 6. **`gpt-5-nano`** — confirm the exact model identifier against OpenAI's current model list at implementation time.
+
+
