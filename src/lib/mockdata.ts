@@ -100,9 +100,9 @@ export interface Item {
 /** Header summary cards on the dashboard. */
 export interface WorkspaceStats {
   totalItems: number;
-  collections: number;
-  tags: number;
-  favorites: number;
+  totalCollections: number;
+  favoriteItems: number;
+  favoriteCollections: number;
 }
 
 // ─────────────────────────────────────────────
@@ -357,7 +357,7 @@ export const items: Item[] = [
     tags: ["ai", "code-review", "system-message"],
     collectionIds: ["col_ai_prompts"],
     isFavorite: true,
-    isPinned: false,
+    isPinned: true,
     createdAt: "2026-05-21T10:30:00.000Z",
     updatedAt: "2026-05-28T12:45:00.000Z",
   },
@@ -428,7 +428,7 @@ export const items: Item[] = [
     tags: ["python", "algorithms", "interview"],
     collectionIds: ["col_python_snippets", "col_interview_prep"],
     isFavorite: true,
-    isPinned: false,
+    isPinned: true,
     createdAt: "2026-05-17T12:00:00.000Z",
     updatedAt: "2026-05-25T14:00:00.000Z",
   },
@@ -468,6 +468,91 @@ export const items: Item[] = [
     createdAt: "2026-05-19T16:00:00.000Z",
     updatedAt: "2026-05-23T10:00:00.000Z",
   },
+  {
+    id: "item_debounce_util",
+    title: "debounce()",
+    typeSlug: "snippet",
+    content:
+      "export function debounce<A extends unknown[]>(\n" +
+      "  fn: (...args: A) => void,\n" +
+      "  delay = 300,\n" +
+      ") {\n" +
+      "  let t: ReturnType<typeof setTimeout>;\n" +
+      "  return (...args: A) => {\n" +
+      "    clearTimeout(t);\n" +
+      "    t = setTimeout(() => fn(...args), delay);\n" +
+      "  };\n" +
+      "}",
+    url: null,
+    fileName: null,
+    fileSize: null,
+    fileUrl: null,
+    language: "typescript",
+    description: "Type-safe debounce for input handlers.",
+    tags: ["typescript", "utils", "performance"],
+    collectionIds: ["col_react_patterns"],
+    isFavorite: false,
+    isPinned: true,
+    createdAt: "2026-06-01T09:00:00.000Z",
+    updatedAt: "2026-06-08T14:30:00.000Z",
+  },
+  {
+    id: "item_find_large_files",
+    title: "Find the 20 largest files",
+    typeSlug: "command",
+    content: "du -ah . | sort -rh | head -n 20",
+    url: null,
+    fileName: null,
+    fileSize: null,
+    fileUrl: null,
+    language: "bash",
+    description: "Track down what is eating disk space.",
+    tags: ["bash", "disk", "devops"],
+    collectionIds: ["col_shell_devops"],
+    isFavorite: false,
+    isPinned: false,
+    createdAt: "2026-06-02T11:00:00.000Z",
+    updatedAt: "2026-06-07T08:15:00.000Z",
+  },
+  {
+    id: "item_tailwind_v4_docs",
+    title: "Tailwind CSS v4 docs",
+    typeSlug: "link",
+    content: null,
+    url: "https://tailwindcss.com/docs",
+    fileName: null,
+    fileSize: null,
+    fileUrl: null,
+    language: null,
+    description: "CSS-first config and the @theme directive reference.",
+    tags: ["tailwind", "css", "docs"],
+    collectionIds: ["col_useful_links"],
+    isFavorite: false,
+    isPinned: false,
+    createdAt: "2026-06-03T13:00:00.000Z",
+    updatedAt: "2026-06-05T17:45:00.000Z",
+  },
+  {
+    id: "item_pr_description_prompt",
+    title: "PR description generator",
+    typeSlug: "prompt",
+    content:
+      "Summarize the following git diff into a concise pull request description " +
+      "with a Title, a short Summary, and a bulleted list of changes. Keep it " +
+      "factual and skip trivial formatting changes.",
+    url: null,
+    fileName: null,
+    fileSize: null,
+    fileUrl: null,
+    language: null,
+    description: "Turns a diff into a clean PR write-up.",
+    tags: ["ai", "git", "productivity"],
+    collectionIds: ["col_ai_prompts"],
+    isFavorite: true,
+    isPinned: false,
+    createdAt: "2026-05-30T10:00:00.000Z",
+    updatedAt: "2026-06-02T10:00:00.000Z",
+  },
 ];
 
 // ─────────────────────────────────────────────
@@ -476,7 +561,7 @@ export const items: Item[] = [
 
 export const workspaceStats: WorkspaceStats = {
   totalItems: 312,
-  collections: 14,
-  tags: 47,
-  favorites: 29,
+  totalCollections: 14,
+  favoriteItems: 23,
+  favoriteCollections: 6,
 };

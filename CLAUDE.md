@@ -20,7 +20,7 @@ This project uses **Next.js 16** and **Tailwind CSS v4** — both have breaking 
 ## Commands
 
 ```bash
-npm run dev      # start dev server (http://localhost:3000)
+npm run dev      # start dev server (http://localhost:4000)
 npm run build    # production build
 npm run lint     # ESLint (eslint.config.mjs, Next.js ruleset)
 ```

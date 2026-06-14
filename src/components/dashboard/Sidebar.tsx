@@ -1,17 +1,44 @@
+"use client";
+
+import { Dialog } from "@base-ui/react/dialog";
+
+import { SidebarBody } from "./SidebarBody";
+import { useSidebar } from "./SidebarProvider";
+
 /**
- * Sidebar — Phase 1 placeholder.
+ * Sidebar — responsive navigation shell.
  *
- * Renders the left navigation shell (fixed width, full height, sidebar
- * surface). Real content — item types, latest collections, library links and
- * the Go Pro card — arrives in a later dashboard phase. For now it is just a
- * labelled placeholder. Hidden below `md` where it will become a drawer later.
+ * - **Desktop (`md+`)**: a sticky, full-height `aside` that collapses to zero
+ *   width (and reflows the main content) when toggled.
+ * - **Mobile**: an overlay drawer built on Base UI's Dialog (focus trap, scroll
+ *   lock, backdrop, Escape to close).
+ *
+ * Both render the same {@link SidebarBody}. Toggle state lives in
+ * {@link useSidebar}; the trigger is in the top bar.
  */
 export function Sidebar() {
+  const { isCollapsed, isMobileOpen, setMobileOpen } = useSidebar();
+
   return (
-    <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-border bg-sidebar md:flex">
-      <div className="flex flex-1 items-center justify-center">
-        <h2 className="text-lg font-semibold text-muted-foreground">Sidebar</h2>
-      </div>
-    </aside>
+    <>
+      {/* Desktop: collapsible persistent sidebar */}
+      <aside
+        data-collapsed={isCollapsed}
+        className="sticky top-0 hidden h-screen shrink-0 overflow-hidden border-r border-sidebar-border bg-sidebar transition-[width] duration-200 ease-in-out data-[collapsed=false]:w-64 data-[collapsed=true]:w-0 data-[collapsed=true]:border-r-0 md:block"
+      >
+        <SidebarBody />
+      </aside>
+
+      {/* Mobile: overlay drawer */}
+      <Dialog.Root open={isMobileOpen} onOpenChange={setMobileOpen}>
+        <Dialog.Portal>
+          <Dialog.Backdrop className="fixed inset-0 z-40 bg-black/50 transition-opacity duration-200 data-ending-style:opacity-0 data-starting-style:opacity-0 md:hidden" />
+          <Dialog.Popup className="fixed inset-y-0 left-0 z-50 w-64 border-r border-sidebar-border bg-sidebar shadow-xl transition-transform duration-200 ease-in-out data-ending-style:-translate-x-full data-starting-style:-translate-x-full md:hidden">
+            <Dialog.Title className="sr-only">Navigation</Dialog.Title>
+            <SidebarBody />
+          </Dialog.Popup>
+        </Dialog.Portal>
+      </Dialog.Root>
+    </>
   );
 }
