@@ -1,0 +1,174 @@
+// schema.prisma
+// Prisma 7 — Rust-free client, ESM, generated client output set explicitly.
+//
+// Migration policy: never `prisma db push`. All schema changes go through
+// migrations (`prisma migrate dev` in development, `prisma migrate deploy` in
+// production). In Prisma 7 the datasource `url` is no longer allowed in the
+// schema — it lives in prisma.config.ts (CLI/Migrate) and is passed to the
+// PrismaClient adapter at runtime (see src/lib/prisma.ts).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────
+// Auth — NextAuth (Auth.js v5) base models + extended User
+// ─────────────────────────────────────────────
+model User {
+  id                   String       @id @default(cuid())
+  name                 String?
+  email                String?      @unique
+  emailVerified        DateTime?
+  image                String?
+
+  // Billing / entitlements
+  isPro                Boolean      @default(false)
+  stripeCustomerId     String?      @unique
+  stripeSubscriptionId String?      @unique
+
+  // Relations
+  accounts             Account[]
+  sessions             Session[]
+  items                Item[]
+  collections          Collection[]
+  itemTypes            ItemType[]   // custom (user-owned) types only
+
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}
+
+// ─────────────────────────────────────────────
+// Domain
+// ─────────────────────────────────────────────
+enum ContentType {
+  text
+  file
+}
+
+model Item {
+  id          String           @id @default(cuid())
+  title       String
+  contentType ContentType
+  content     String? // text content, or null when file-backed
+  fileUrl     String? // R2 URL, or null for text
+  fileName    String? // original filename
+  fileSize    Int? // bytes
+  url         String? // for link types
+  description String?
+  language    String? // optional, for code highlighting
+  isFavorite  Boolean          @default(false)
+  isPinned    Boolean          @default(false)
+
+  // Relations
+  userId      String
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  itemTypeId  String
+  itemType    ItemType         @relation(fields: [itemTypeId], references: [id])
+  collections ItemCollection[]
+  tags        Tag[]            @relation("ItemTags")
+
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([userId])
+  @@index([itemTypeId])
+}
+
+model ItemType {
+  id       String  @id @default(cuid())
+  name     String
+  icon     String
+  color    String
+  isSystem Boolean @default(false)
+
+  // user is null for system types, set for custom types
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items  Item[]
+
+  @@index([userId])
+}
+
+model Collection {
+  id            String           @id @default(cuid())
+  name          String
+  description   String?
+  isFavorite    Boolean          @default(false)
+  defaultTypeId String? // default type for new/empty collections
+
+  userId String
+  user   User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items  ItemCollection[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+// Join table — Item ↔ Collection (many-to-many)
+model ItemCollection {
+  itemId       String
+  collectionId String
+  addedAt      DateTime @default(now())
+
+  item       Item       @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@id([itemId, collectionId])
+  @@index([collectionId])
+}
+
+model Tag {
+  id    String @id @default(cuid())
+  name  String @unique
+  items Item[] @relation("ItemTags")
+}
